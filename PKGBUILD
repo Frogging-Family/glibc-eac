@@ -6,6 +6,10 @@
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->glibc->binutils->gcc
 # NOTE: valgrind requires rebuilt with each major glibc version
 
+# Enable/disable each fix we offer
+_eos_eac_fix="true"
+_rogue_company_fix="true"
+
 pkgbase=glibc
 pkgname=(glibc lib32-glibc)
 pkgver=2.36
@@ -48,7 +52,14 @@ prepare() {
   patch -Np1 -i "${srcdir}"/disable-clone3.diff
 
   # Reverting e47de5cb2d4dbecb58f569ed241e8e95c568f03c
-  patch -Np1 -R -i "${srcdir}"/e47de5cb.patch
+  if [ "$_eos_eac_fix" = "true" ]; then
+    patch -Np1 -R -i "${srcdir}"/e47de5cb.patch
+  fi
+
+  # Reverting 7a5db2e82fbb6c3a6e3fdae02b7166c5d0e8c7a8, 8208be389bce84be0e1c35a3daa0c3467418f921, 6bf789d69e6be48419094ca98f064e00297a27d5, b89d5de2508215ef3131db7bed76ac50b3f4c205, 86f0179bc003ffc34ffaa8d528a7a90153ac06c6 for Rogue Company to work again
+  if [ "$_rogue_company_fix" = "true" ]; then
+    patch -Np1 -i "${srcdir}"/rogue_company_reverts.patch
+  fi
 }
 
 build() {
