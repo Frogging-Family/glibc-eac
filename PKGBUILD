@@ -122,7 +122,8 @@ build() {
 
   # pregenerate C.UTF-8 locale until it is built into glibc
   # (https://sourceware.org/glibc/wiki/Proposals/C.UTF-8, FS#74864)
-  # !HACK! Use system localedef instead of locale/localedef
+  # !HACK! Use system localedef instead of locale/localedef - That was necessary to build against a 2.35 OS, but it shouldn't be needed on 2.36
+  # That should probably be dropped once testing validates that the package indeed works fine
   localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
 }
 
