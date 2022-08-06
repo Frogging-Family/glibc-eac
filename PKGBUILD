@@ -27,6 +27,7 @@ source=(git+https://sourceware.org/git/glibc.git#commit=${_commit}
         sdt.h sdt-config.h
         disable-clone3.diff
         e47de5cb.patch
+        rogue_company_reverts.patch
 )
 validpgpkeys=(7273542B39962DF7B299931416792B4EA25340F8 # Carlos O'Donell
               BC7C7372637EC10C57D7AA6579C43DFBF1CF2187) # Siddhesh Poyarekar
@@ -37,6 +38,7 @@ b2sums=('SKIP'
         'a6a5e2f2a627cc0d13d11a82458cfd0aa75ec1c5a3c7647e5d5a3bb1d4c0770887a3909bfda1236803d5bc9801bfd6251e13483e9adf797e4725332cd0d91a0e'
         '214e995e84b342fe7b2a7704ce011b7c7fc74c2971f98eeb3b4e677b99c860addc0a7d91b8dc0f0b8be7537782ee331999e02ba48f4ccc1c331b60f27d715678'
         'edef5f724f68ea95c6b0127bd13a10245f548afc381b2d0a6d1d06ee9f87b7dd89c6becd35d5ae722bf838594eb870a747f67f07f46e7d63f8c8d1a43cce4a52'
+        'SKIP'
         'SKIP')
 
 prepare() {
