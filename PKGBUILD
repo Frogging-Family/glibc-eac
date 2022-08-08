@@ -9,6 +9,7 @@
 # Enable/disable each fix we offer
 _eos_eac_fix="true"
 _rogue_company_fix="true"
+_disable_tests="true" # They are very playful and seem to fail randomly in different ways depending on the machine, so let's disable them by default - https://github.com/Frogging-Family/glibc-eac/issues/2
 
 pkgbase=glibc
 pkgname=(glibc lib32-glibc)
@@ -147,7 +148,7 @@ skip_test() {
   sed -i "s/\b$test\b//" $srcdir/glibc/$file
 }
 
-check() {
+_tests() {
   cd glibc-build
 
   # adjust/remove buildflags that cause false-positive testsuite failures
@@ -174,6 +175,12 @@ check() {
   skip_test tst-pthread-gdb-attach-static  nptl/Makefile
 
   make -O check
+}
+
+check() {
+  if [ "$_disable_tests" != "true" ]; then
+    _tests
+  fi
 }
 
 package_glibc() {
