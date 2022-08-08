@@ -3,6 +3,9 @@
 # Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 # Contributor: Allan McRae <allan@archlinux.org>
 
+# Hacked up for eos-eac and Rogue Company compat by: Tk-Glitch <tkg@froggi.es>
+# Thanks to Frogging101 for the 2.36 bisection and GloriousEggroll for the Rogue Company breakage one past 2.33
+
 # toolchain build order: linux-api-headers->glibc->binutils->gcc->glibc->binutils->gcc
 # NOTE: valgrind requires rebuilt with each major glibc version
 
