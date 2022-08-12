@@ -1,5 +1,8 @@
 # glibc-eac
 
+**Update: As of https://github.com/archlinux/svntogit-packages/commit/e1d69d80d07494e3c086ee2c5458594d5261d2e4, Arch glibc will work again with eos-eac games, except for Rogue Company which needs additional reverts.
+The approach used by Arch's glibc maintainer is the same as this (reverting the offending change), so updating to the 2.36-2 package will be totally seemless. Rogue Company players, I fear you'll have to keep using this package.**
+
 Arch glibc with commits breaking eos-eac and Rogue Company patched out.
 
 Warhammer Vermintide 2 (Steam) - Newer eac
