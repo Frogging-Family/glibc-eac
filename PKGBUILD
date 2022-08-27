@@ -18,7 +18,7 @@ pkgbase=glibc
 pkgname=(glibc lib32-glibc)
 pkgver=2.36
 _commit=c804cd1c00adde061ca51711f63068c103e94eef
-pkgrel=2
+pkgrel=3
 arch=(x86_64)
 url='https://www.gnu.org/software/libc'
 license=(GPL LGPL)
@@ -29,7 +29,6 @@ source=(git+https://sourceware.org/git/glibc.git#commit=${_commit}
         locale-gen
         lib32-glibc.conf
         sdt.h sdt-config.h
-        disable-clone3.diff
         e47de5cb.patch
         rogue_company_reverts.patch
 )
@@ -41,7 +40,6 @@ b2sums=('SKIP'
         '7c265e6d36a5c0dff127093580827d15519b6c7205c2e1300e82f0fb5b9dd00b6accb40c56581f18179c4fbbc95bd2bf1b900ace867a83accde0969f7b609f8a'
         'a6a5e2f2a627cc0d13d11a82458cfd0aa75ec1c5a3c7647e5d5a3bb1d4c0770887a3909bfda1236803d5bc9801bfd6251e13483e9adf797e4725332cd0d91a0e'
         '214e995e84b342fe7b2a7704ce011b7c7fc74c2971f98eeb3b4e677b99c860addc0a7d91b8dc0f0b8be7537782ee331999e02ba48f4ccc1c331b60f27d715678'
-        'edef5f724f68ea95c6b0127bd13a10245f548afc381b2d0a6d1d06ee9f87b7dd89c6becd35d5ae722bf838594eb870a747f67f07f46e7d63f8c8d1a43cce4a52'
         'SKIP'
         'SKIP')
 
@@ -50,12 +48,6 @@ prepare() {
 
   [[ -d glibc-$pkgver ]] && ln -s glibc-$pkgver glibc
   cd glibc
-
-  # Disable clone3 syscall for now
-  # Can be removed when eletron{9,11,12} and discord are removed or patched:
-  # https://github.com/electron/electron/commit/993ecb5bdd5c57024c8718ca6203a8f924d6d574
-  # Patch src: https://patchwork.ozlabs.org/project/glibc/patch/87eebkf8ph.fsf@oldenburg.str.redhat.com/
-  patch -Np1 -i "${srcdir}"/disable-clone3.diff
 
   # Reverting e47de5cb2d4dbecb58f569ed241e8e95c568f03c
   if [ "$_eos_eac_fix" = "true" ]; then
