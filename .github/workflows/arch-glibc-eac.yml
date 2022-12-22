@@ -16,7 +16,7 @@ jobs:
           useradd user -G wheel && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user -R ..
           chown user -R /tmp
-          su user -c "yes ''|PKGDEST=/tmp/glibc makepkg --noconfirm -s"
+          su user -c "yes ''|PKGDEST=/tmp/glibc ./glibc_eac.sh"
 
       - name: Archive the artifacts
         uses: actions/upload-artifact@v2

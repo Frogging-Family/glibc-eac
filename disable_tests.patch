@@ -1,0 +1,50 @@
+From d4a4e391e63025a655813019bd391e16eff3cd8f Mon Sep 17 00:00:00 2001
+From: Etienne JUVIGNY <ti3nou@gmail.com>
+Date: Thu, 22 Dec 2022 16:15:28 +0100
+Subject: Remove tests, unhappy after the reverts
+
+
+diff --git a/trunk/PKGBUILD b/trunk/PKGBUILD
+index 3a8bdc5..876ea32 100644
+--- a/trunk/PKGBUILD
++++ b/trunk/PKGBUILD
+@@ -124,39 +124,6 @@ build() {
+   elf/ld.so --library-path "$PWD" locale/localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
+ }
+ 
+-# Credits for skip_test() and check() @allanmcrae
+-# https://github.com/allanmcrae/toolchain/blob/f18604d70c5933c31b51a320978711e4e6791cf1/glibc/PKGBUILD
+-skip_test() {
+-  test=${1}
+-  file=${2}
+-  sed -i "s/\b${test}\b//" "${srcdir}"/glibc/${file}
+-}
+-
+-check() {
+-  cd glibc-build
+-
+-  # adjust/remove buildflags that cause false-positive testsuite failures
+-  sed -i '/FORTIFY/d' configparms                                     # failure to build testsuite
+-  sed -i 's/-Werror=format-security/-Wformat-security/' config.make   # failure to build testsuite
+-  sed -i '/CFLAGS/s/-fno-plt//' config.make                           # 16 failures
+-  sed -i '/CFLAGS/s/-fexceptions//' config.make                       # 1 failure
+-  LDFLAGS=${LDFLAGS/,-z,now/}                                         # 10 failures
+-
+-  # The following tests fail due to restrictions in the Arch build system
+-  # The correct fix is to add the following to the systemd-nspawn call:
+-  # --system-call-filter="@clock @memlock @pkey"
+-  skip_test test-errno-linux        sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-mlock2              sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-ntp_gettime         sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-ntp_gettimex        sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-pkey                sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-process_mrelease    sysdeps/unix/sysv/linux/Makefile
+-  skip_test tst-adjtime             time/Makefile
+-  skip_test tst-clock2              time/Makefile
+-
+-  make -O check
+-}
+-
+ package_glibc() {
+   pkgdesc='GNU C Library'
+   depends=('linux-api-headers>=4.10' tzdata filesystem)

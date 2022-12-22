@@ -1,0 +1,19 @@
+From 93a65e6b08ffaf968b3f5e98909d4ccdf30a6b76 Mon Sep 17 00:00:00 2001
+From: Etienne JUVIGNY <ti3nou@gmail.com>
+Date: Thu, 22 Dec 2022 16:32:29 +0100
+Subject: Disable debug
+
+
+diff --git a/trunk/PKGBUILD b/trunk/PKGBUILD
+index a783164..9a2248f 100644
+--- a/trunk/PKGBUILD
++++ b/trunk/PKGBUILD
+@@ -15,7 +15,7 @@ arch=(x86_64)
+ url='https://www.gnu.org/software/libc'
+ license=(GPL LGPL)
+ makedepends=(git gd lib32-gcc-libs python)
+-options=(debug staticlibs !lto)
++options=(staticlibs !lto)
+ source=(git+https://sourceware.org/git/glibc.git#commit=${_commit}
+         locale.gen.txt
+         locale-gen
