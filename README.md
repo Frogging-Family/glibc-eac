@@ -5,6 +5,8 @@ The approach used by Arch's glibc maintainer is the same as this (reverting the 
 
 Arch glibc with commits breaking eos-eac and Rogue Company patched out.
 
+Run `./glibc_eac.sh` to build and install, or `./glic_eac.sh build` to only build.
+
 Warhammer Vermintide 2 (Steam) - Newer eac
 ![Screenshot_20220808_171315](https://user-images.githubusercontent.com/741977/183456541-1ee77f9f-33e4-4066-81ac-fbcb32d1f58e.png)
 
