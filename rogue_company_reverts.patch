@@ -648,16 +648,16 @@ index 57bb95ebc3..3924362ce9 100644
  #include <dl-procinfo.h>
 
 @@ -846,7 +845,9 @@ search_dir (const struct dir_entry *entry)
- 	 subdirectory (if not already processing a glibc-hwcaps
- 	 subdirectory)?  The dynamic linker is also considered as
- 	 shared library.  */
+ 	continue;
+       /* Does this file look like a shared library?  The dynamic linker
+ 	 is also considered as shared library.  */
 -      if (!_dl_is_dso (direntry->d_name)
 +      if (((strncmp (direntry->d_name, "lib", 3) != 0
 +	    && strncmp (direntry->d_name, "ld-", 3) != 0)
 +	   || strstr (direntry->d_name, ".so") == NULL)
- 	  && (direntry->d_type == DT_REG
- 	      || (entry->hwcaps == NULL
- 		  && !is_hwcap_platform (direntry->d_name))))
+ 	  && (direntry->d_type == DT_REG || entry->hwcaps == NULL))
+ 	continue;
+
 --
 2.36.1
 
