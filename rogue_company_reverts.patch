@@ -57,9 +57,9 @@ index 3536b6af5e..b5f19b48c3 100644
    tst-ldconfig-ld-mod \
    tst-main1mod \
 +  tst-libc_dlvsym-dso \
-   tst-nodelete2mod \
    tst-nodelete-dlclose-dso \
    tst-nodelete-dlclose-plugin \
+   tst-nodelete-opened-lib \
 @@ -939,7 +942,7 @@ modules-names += \
 
  # Most modules build with _ISOMAC defined, but those filtered out
@@ -632,9 +632,9 @@ index 67428f2de2..5bcf73869b 100644
    tst-debug1 \
    tst-deep1 \
 -  tst-dl-is_dso \
+   tst-dlclose-lazy \
    tst-dlmodcount \
-   tst-dlmopen1 \
-   tst-dlmopen3 \
+   tst-dlmopen-dlerror \
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
 index 57bb95ebc3..3924362ce9 100644
 --- a/elf/ldconfig.c
