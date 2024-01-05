@@ -8,19 +8,19 @@ diff --git a/PKGBUILD b/PKGBUILD
 index 3a8bdc5..876ea32 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
-@@ -124,38 +124,6 @@ build() {
-   elf/ld.so --library-path "$PWD" locale/localedef -c -f ../glibc/localedata/charmaps/UTF-8 -i ../glibc/localedata/locales/C ../C.UTF-8/
+@@ -116,38 +116,6 @@ build() {
+     DESTDIR="${srcdir}"/locales install-locale-files
  }
  
--# Credits for skip_test() and check() @allanmcrae
+-# Credits for _skip_test() and check() @allanmcrae
 -# https://github.com/allanmcrae/toolchain/blob/f18604d70c5933c31b51a320978711e4e6791cf1/glibc/PKGBUILD
--skip_test() {
+-_skip_test() {
 -  test=${1}
 -  file=${2}
 -  sed -i "/\b${test} /d" "${srcdir}"/glibc/${file}
 -}
 -
--check() {
+-check() (
 -  cd glibc-build
 -
 -  # adjust/remove buildflags that cause false-positive testsuite failures
@@ -33,16 +33,16 @@ index 3a8bdc5..876ea32 100644
 -  # The following tests fail due to restrictions in the Arch build system
 -  # The correct fix is to add the following to the systemd-nspawn call:
 -  # --system-call-filter="@clock @memlock @pkey"
--  skip_test test-errno-linux        sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-mlock2              sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-ntp_gettime         sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-ntp_gettimex        sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-pkey                sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-process_mrelease    sysdeps/unix/sysv/linux/Makefile
--  skip_test tst-adjtime             time/Makefile
+-  _skip_test test-errno-linux        sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-mlock2              sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-ntp_gettime         sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-ntp_gettimex        sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-pkey                sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-process_mrelease    sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-adjtime             time/Makefile
 -
 -  make -O check
--}
+-)
 -
  package_glibc() {
    pkgdesc='GNU C Library'
