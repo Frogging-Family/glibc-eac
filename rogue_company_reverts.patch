@@ -36,10 +36,10 @@ diff --git a/elf/Makefile b/elf/Makefile
 index 3536b6af5e..b5f19b48c3 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -290,6 +290,7 @@ tests-static-internal := \
-   tst-stackguard1-static \
+@@ -285,6 +285,7 @@ tests-static-internal := \
    tst-tls1-static \
    tst-tls1-static-non-pie \
+   tst-tunables \
 +  tst-libc_dlvsym-static
    # tests-static-internal
 

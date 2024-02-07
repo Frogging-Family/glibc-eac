@@ -8,7 +8,7 @@ diff --git a/PKGBUILD b/PKGBUILD
 index 3a8bdc5..876ea32 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
-@@ -116,38 +116,6 @@ build() {
+@@ -116,39 +116,6 @@ build() {
      DESTDIR="${srcdir}"/locales install-locale-files
  }
  
@@ -39,6 +39,7 @@ index 3a8bdc5..876ea32 100644
 -  _skip_test tst-ntp_gettimex        sysdeps/unix/sysv/linux/Makefile
 -  _skip_test tst-pkey                sysdeps/unix/sysv/linux/Makefile
 -  _skip_test tst-process_mrelease    sysdeps/unix/sysv/linux/Makefile
+-  _skip_test tst-shstk-legacy-1g     sysdeps/x86_64/Makefile
 -  _skip_test tst-adjtime             time/Makefile
 -
 -  make -O check

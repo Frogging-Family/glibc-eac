@@ -1,9 +1,14 @@
   # Enable/disable each fix we offer
+  _reenable_dt_hash="true"
   _rogue_company_fix="true"
   _disable_tests="true" # They are very playful and seem to fail randomly in different ways depending on the machine, so let's disable them by default - https://github.com/Frogging-Family/glibc-eac/issues/2
 
   rm -rf ./glibc && git clone --depth=1 --single-branch -b main https://gitlab.archlinux.org/archlinux/packaging/packages/glibc.git
   cd ./glibc
+
+  if [ "$_reenable_dt_hash" = "true" ]; then
+    patch -Np1 -i ../inject_reenable_DT_HASH.patch && cp ../reenable_DT_HASH.patch ./
+  fi
 
   if [ "$_rogue_company_fix" = "true" ]; then
     patch -Np1 -i ../inject_rogue_company_reverts.patch && cp ../rogue_company_reverts.patch ./
