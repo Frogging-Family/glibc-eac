@@ -8,7 +8,7 @@ diff --git a/PKGBUILD b/PKGBUILD
 index 3a8bdc5..876ea32 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
-@@ -116,39 +116,6 @@ build() {
+@@ -116,38 +116,6 @@ build() {
      DESTDIR="${srcdir}"/locales install-locale-files
  }
  
@@ -28,7 +28,6 @@ index 3a8bdc5..876ea32 100644
 -  sed -i 's/-Werror=format-security/-Wformat-security/' config.make   # failure to build testsuite
 -  sed -i '/CFLAGS/s/-fno-plt//' config.make                           # 16 failures
 -  sed -i '/CFLAGS/s/-fexceptions//' config.make                       # 1 failure
--  LDFLAGS=${LDFLAGS/,-z,now/}                                         # 10 failures
 -
 -  # The following tests fail due to restrictions in the Arch build system
 -  # The correct fix is to add the following to the systemd-nspawn call:
