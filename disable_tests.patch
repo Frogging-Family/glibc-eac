@@ -5,10 +5,10 @@ Subject: Remove tests, unhappy after the reverts
 
 
 diff --git a/PKGBUILD b/PKGBUILD
-index 3a8bdc5..876ea32 100644
+index 742a4f64d90893fea6fdefc3d21d48970f29b62d..e03ca838fe92ad7b80ce862bb108a1042a04167b 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
-@@ -116,38 +116,6 @@ build() {
+@@ -117,38 +117,6 @@ build() {
      DESTDIR="${srcdir}"/locales install-locale-files
  }
  
