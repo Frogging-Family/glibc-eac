@@ -5,10 +5,10 @@ Subject: Remove tests, unhappy after the reverts
 
 
 diff --git a/PKGBUILD b/PKGBUILD
-index a89c4340b041a7b917e413e3fbd496f55b4d06f7..b3f0719608a84bf1a1d8e11ef648c70aae5dc957 100644
+index c403c10730da7ad32ddd3853f06ac4ab4b3b4f92..fafba76e132451f9c8bda57f7cdc91cac39cf833 100644
 --- a/PKGBUILD
 +++ b/PKGBUILD
-@@ -121,38 +121,6 @@ build() {
+@@ -125,37 +125,6 @@ build() {
      DESTDIR="${srcdir}"/locales install-locale-files
  }
  
@@ -17,16 +17,15 @@ index a89c4340b041a7b917e413e3fbd496f55b4d06f7..b3f0719608a84bf1a1d8e11ef648c70a
 -_skip_test() {
 -  test=${1}
 -  file=${2}
--  sed -i "/\b${test} /d" "${srcdir}"/glibc/${file}
+-  sed -i "/\b${test} /d" "${srcdir}/glibc/${file}"
 -}
 -
 -check() (
 -  cd glibc-build
 -
 -  # adjust/remove buildflags that cause false-positive testsuite failures
--  sed -i '/FORTIFY/d' configparms                                     # failure to build testsuite
 -  sed -i 's/-Werror=format-security/-Wformat-security/' config.make   # failure to build testsuite
--  sed -i '/CFLAGS/s/-fno-plt//' config.make                           # 16 failures
+-  sed -i '/CFLAGS/s/-fno-plt//' config.make                           # 27 failures
 -  sed -i '/CFLAGS/s/-fexceptions//' config.make                       # 1 failure
 -
 -  # The following tests fail due to restrictions in the Arch build system
