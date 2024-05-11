@@ -672,21 +672,21 @@ This reverts commit b89d5de2508215ef3131db7bed76ac50b3f4c205.
  1 file changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/Makerules b/Makerules
-index d0931a3583..5b53835faf 100644
+index 2c22c69e2199d86264c3a3c4d0492d9b5845682b..2b56e133f562376cd54a7cab6cf26d6a061787b3 100644
 --- a/Makerules
 +++ b/Makerules
-@@ -981,21 +981,22 @@ install-lib.so := $(filter %.so,$(install-lib:%_pic.a=%.so))
+@@ -932,21 +932,22 @@ install-lib.so := $(filter %.so,$(install-lib:%_pic.a=%.so))
  install-lib := $(filter-out %.so %_pic.a,$(install-lib))
-
+ 
  ifeq (yes,$(build-shared))
 -# Find which .so's have a version number in their soname.
 +# Find which .so's have versions.
  versioned := $(strip $(foreach so,$(install-lib.so),\
  			       $(patsubst %,$(so),$($(so)-version))))
-
+ 
  install-lib.so-versioned := $(filter $(versioned), $(install-lib.so))
  install-lib.so-unversioned := $(filter-out $(versioned), $(install-lib.so))
-
+ 
 -# For libraries whose soname have version numbers, we install three files:
 +# For versioned libraries, we install three files:
  #	$(inst_libdir)/libfoo.so	-- for linking, symlink or ld script
@@ -699,17 +699,17 @@ index d0931a3583..5b53835faf 100644
 -				$(inst_slibdir)/$(L:.so=)-$(version).so \
 +				$(inst_slibdir)/$(L:.so=)-$(lib-version).so \
  				$(inst_slibdir)/$L$($L-version))
-
+ 
  # Install all the unversioned shared libraries.
-@@ -1124,6 +1125,7 @@ include $(o-iterator)
-
+@@ -1075,6 +1076,7 @@ include $(o-iterator)
+ 
  generated += $(foreach o,$(versioned),$o$($o-version))
-
+ 
 +ifeq (,$($(subdir)-version))
  define o-iterator-doit
  $(inst_slibdir)/$o$($o-version): $(inst_slibdir)/$(o:.so=)-$(version).so \
  				 $(+force);
-@@ -1138,7 +1140,23 @@ $(inst_slibdir)/$(o:.so=)-$(version).so: $(objpfx)$o $(+force);
+@@ -1089,7 +1091,23 @@ $(inst_slibdir)/$(o:.so=)-$(version).so: $(objpfx)$o $(+force);
  endef
  object-suffixes-left := $(versioned)
  include $(o-iterator)
@@ -731,11 +731,9 @@ index d0931a3583..5b53835faf 100644
 +include $(o-iterator)
 +endif
 +endif
-
+ 
  define do-install-so
  $(do-install-program)
---
-2.36.1
 
 From 0a5e5014b621fed7fe077fdcbdd7727dd12c8d9f Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
