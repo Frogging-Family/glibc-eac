@@ -502,13 +502,13 @@ index b1454882bd..bde07cdf2a 100644
  	-test ! -x $(elf-objpfx)ldconfig || LC_ALL=C \
  	  $(elf-objpfx)ldconfig $(addprefix -r ,$(install_root)) \
 diff --git a/Makerules b/Makerules
-index 5de2cec6be..d0931a3583 100644
+index 00365bc58be119bb0fec9cf2cfa51780c27fae8c..2c22c69e2199d86264c3a3c4d0492d9b5845682b 100644
 --- a/Makerules
 +++ b/Makerules
-@@ -988,12 +988,14 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
+@@ -939,12 +939,14 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
  install-lib.so-versioned := $(filter $(versioned), $(install-lib.so))
  install-lib.so-unversioned := $(filter-out $(versioned), $(install-lib.so))
-
+ 
 -# For libraries whose soname have version numbers, we install two files:
 +# For libraries whose soname have version numbers, we install three files:
  #	$(inst_libdir)/libfoo.so	-- for linking, symlink or ld script
@@ -520,12 +520,12 @@ index 5de2cec6be..d0931a3583 100644
  				$(inst_libdir)/$L \
 +				$(inst_slibdir)/$(L:.so=)-$(version).so \
  				$(inst_slibdir)/$L$($L-version))
-
+ 
  # Install all the unversioned shared libraries.
-@@ -1026,8 +1028,34 @@ ln -f $(objpfx)/$(@F) $@
+@@ -977,8 +979,34 @@ ln -f $(objpfx)/$(@F) $@
  endef
  endif
-
+ 
 +ifeq (yes,$(build-shared))
 +ifeq (no,$(cross-compiling))
 +symbolic-link-prog := $(elf-objpfx)sln
@@ -556,11 +556,11 @@ index 5de2cec6be..d0931a3583 100644
 +	$(make-shlib-link)
 +$(inst_slibdir)/libc-$(version).so: $(common-objpfx)libc.so $(+force)
  	$(do-install-program)
-
+ 
  install: $(inst_slibdir)/libc.so$(libc.so-version)
-@@ -1097,7 +1125,15 @@ include $(o-iterator)
+@@ -1048,7 +1076,15 @@ include $(o-iterator)
  generated += $(foreach o,$(versioned),$o$($o-version))
-
+ 
  define o-iterator-doit
 -$(inst_slibdir)/$o$($o-version): $(objpfx)$o $(+force);
 +$(inst_slibdir)/$o$($o-version): $(inst_slibdir)/$(o:.so=)-$(version).so \
@@ -575,19 +575,20 @@ index 5de2cec6be..d0931a3583 100644
  	$$(do-install-program)
  endef
  object-suffixes-left := $(versioned)
+
 diff --git a/elf/Makefile b/elf/Makefile
-index 3536b6af5e..67428f2de2 100644
+index 6c8a9e80ba5f91f88e21478084e981f8a30e911d..61384c9b3f932b8ee7105e83158fd8f847818288 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -1338,10 +1338,16 @@ $(objpfx)trusted-dirs.st: Makefile $(..)Makeconfig
+@@ -1375,10 +1375,16 @@ $(objpfx)trusted-dirs.st: Makefile $(..)Makeconfig
  CPPFLAGS-dl-load.c += -I$(objpfx). -I$(csu-objpfx).
-
+ 
  ifeq (yes,$(build-shared))
 -$(inst_rtlddir)/$(rtld-installed-name): $(objpfx)ld.so $(+force)
 +$(inst_slibdir)/$(rtld-version-installed-name): $(objpfx)ld.so $(+force)
  	$(make-target-directory)
  	$(do-install-program)
-
+ 
 +$(inst_rtlddir)/$(rtld-installed-name): \
 +  $(inst_slibdir)/$(rtld-version-installed-name) \
 +  $(inst_slibdir)/libc-$(version).so
@@ -597,17 +598,15 @@ index 3536b6af5e..67428f2de2 100644
  # Creates the relative /usr/bin/ld.so symbolic link.
  $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
  	$(make-target-directory)
-@@ -1350,7 +1356,7 @@ $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
+@@ -1387,7 +1393,7 @@ $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
  # Special target called by parent to install just the dynamic linker.
  .PHONY: ldso_install
  ldso_install: $(inst_rtlddir)/$(rtld-installed-name)
 -endif # $(build-shared)
 +endif
-
-
+ 
+ 
  # Workarounds for ${exec_prefix} expansion in configure variables.
---
-2.36.1
 
 From 270af4eb5410092fbcbe7acd369c7e5a9d27f844 Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
@@ -626,10 +625,10 @@ This reverts commit 6bf789d69e6be48419094ca98f064e00297a27d5.
  delete mode 100644 elf/tst-dl-is_dso.c
 
 diff --git a/elf/Makefile b/elf/Makefile
-index 67428f2de2..5bcf73869b 100644
+index 61384c9b3f932b8ee7105e83158fd8f847818288..31d0f611162bc047f9aa18f38a79ddbdefc52eed 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -401,7 +401,6 @@ tests += \
+@@ -404,7 +404,6 @@ tests += \
    tst-big-note \
    tst-debug1 \
    tst-deep1 \
@@ -637,8 +636,9 @@ index 67428f2de2..5bcf73869b 100644
    tst-dlclose-lazy \
    tst-dlmodcount \
    tst-dlmopen-dlerror \
+
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 57bb95ebc3..3924362ce9 100644
+index b64c54b53e1aa5bfb2806eb50d13757e8cb24396..3eab865bf3a0be792cea5d63ff771802d4e3e488 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -42,7 +42,6 @@
@@ -646,10 +646,10 @@ index 57bb95ebc3..3924362ce9 100644
  #include <dl-cache.h>
  #include <dl-hwcaps.h>
 -#include <dl-is_dso.h>
-
+ 
  #include <dl-procinfo.h>
-
-@@ -846,7 +845,9 @@ search_dir (const struct dir_entry *entry)
+ 
+@@ -742,7 +741,9 @@ search_dir (const struct dir_entry *entry)
  	continue;
        /* Does this file look like a shared library?  The dynamic linker
  	 is also considered as shared library.  */
@@ -659,9 +659,7 @@ index 57bb95ebc3..3924362ce9 100644
 +	   || strstr (direntry->d_name, ".so") == NULL)
  	  && (direntry->d_type == DT_REG || entry->hwcaps == NULL))
  	continue;
-
---
-2.36.1
+ 
 
 From 020733a3dcbfbb7340c31c99653a6a95d26b5fe7 Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
