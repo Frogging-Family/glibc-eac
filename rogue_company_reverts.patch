@@ -33,18 +33,18 @@ index 5047b14066..d0194a7cef 100644
  }
 +libc_hidden_def (_dlerror_run)
 diff --git a/elf/Makefile b/elf/Makefile
-index 3536b6af5e..b5f19b48c3 100644
+index a50a988e7362cf3b20ea1c05e1f8eb9f6df2b996..6c8a9e80ba5f91f88e21478084e981f8a30e911d 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -285,6 +285,7 @@ tests-static-internal := \
+@@ -286,6 +286,7 @@ tests-static-internal := \
    tst-tls1-static \
    tst-tls1-static-non-pie \
    tst-tunables \
 +  tst-libc_dlvsym-static
    # tests-static-internal
-
+ 
  CRT-tst-tls1-static-non-pie := $(csu-objpfx)crt1.o
-@@ -498,6 +499,7 @@ tests-internal += \
+@@ -508,6 +509,7 @@ tests-internal += \
    tst-dlmopen2 \
    tst-ptrguard1 \
    tst-stackguard1 \
@@ -52,27 +52,27 @@ index 3536b6af5e..b5f19b48c3 100644
    tst-tls-surplus \
    tst-tls3 \
    tst-tls6 \
-@@ -820,6 +822,7 @@ modules-names = \
-   tst-latepthreadmod \
-   tst-ldconfig-ld-mod \
+@@ -867,6 +869,7 @@ modules-names += \
+   tst-ldconfig-soname-lib-with-soname \
+   tst-ldconfig-soname-lib-without-soname \
    tst-main1mod \
 +  tst-libc_dlvsym-dso \
    tst-nodelete-dlclose-dso \
    tst-nodelete-dlclose-plugin \
    tst-nodelete-opened-lib \
-@@ -939,7 +942,7 @@ modules-names += \
-
+@@ -994,7 +997,7 @@ modules-names += \
+ 
  # Most modules build with _ISOMAC defined, but those filtered out
  # depend on internal headers.
 -modules-names-tests = $(filter-out ifuncmod% tst-tlsmod%,\
 +modules-names-tests = $(filter-out ifuncmod% tst-libc_dlvsym-dso tst-tlsmod%,\
  				   $(modules-names))
-
- ifeq (yes,$(have-mtls-dialect-gnu2))
-@@ -2432,6 +2435,14 @@ LDLIBS-tst-absolute-zero-lib.so = tst-absolute-zero-lib.lds
+ 
+ # For +depfiles in Makerules.
+@@ -2472,6 +2475,14 @@ LDLIBS-tst-absolute-zero-lib.so = tst-absolute-zero-lib.lds
  $(objpfx)tst-absolute-zero-lib.so: $(LDLIBS-tst-absolute-zero-lib.so)
  $(objpfx)tst-absolute-zero: $(objpfx)tst-absolute-zero-lib.so
-
+ 
 +# Both the main program and the DSO for tst-libc_dlvsym need to link
 +# against libdl.
 +$(objpfx)tst-libc_dlvsym-dso.so: $(libsupport)
@@ -84,41 +84,45 @@ index 3536b6af5e..b5f19b48c3 100644
  $(objpfx)tst-big-note: $(objpfx)tst-big-note-lib.so
  # Avoid creating an ABI tag note, which may come before the
  # artificial, large note in tst-big-note-lib.o and invalidate the
+
 diff --git a/elf/Versions b/elf/Versions
-index 775aab62af..a12d64e8db 100644
+index 1591031da990eb93e3d190978a0cd2edf064a6a6..eab8832d2fd16185c766857a905e1fdbdfaa1807 100644
 --- a/elf/Versions
 +++ b/elf/Versions
-@@ -22,6 +22,9 @@ libc {
- %endif
+@@ -30,6 +30,9 @@ libc {
+   }
    GLIBC_PRIVATE {
      # functions used in other libraries
 +    _dl_addr;
 +    _dl_sym; _dl_vsym;
 +    __libc_dlclose; __libc_dlopen_mode; __libc_dlsym; __libc_dlvsym;
      __libc_early_init;
+   }
+ }
 
-     # Internal error handling support.  Interposes the functions in ld.so.
 diff --git a/elf/dl-addr.c b/elf/dl-addr.c
-index 3226880d48..70a60d5b91 100644
+index 92a9b91b275e2d31236cd6e4a85e9d32348c7696..4acda3b8ec13beb173f370895b0152083097b5ee 100644
 --- a/elf/dl-addr.c
 +++ b/elf/dl-addr.c
-@@ -142,3 +142,4 @@ _dl_addr (const void *address, Dl_info *info,
-
+@@ -136,3 +136,4 @@ _dl_addr (const void *address, Dl_info *info,
+ 
    return result;
  }
 +libc_hidden_def (_dl_addr)
+
 diff --git a/elf/dl-libc.c b/elf/dl-libc.c
-index d5bc4a277f..ba792e9589 100644
+index 3c048cc6c1791a60ae4610269bf0b85d062bea68..ba3e9fb1c78d0407eb4b81b8bfad8925e616b537 100644
 --- a/elf/dl-libc.c
 +++ b/elf/dl-libc.c
-@@ -162,6 +162,7 @@ __libc_dlopen_mode (const char *name, int mode)
+@@ -161,6 +161,7 @@ __libc_dlopen_mode (const char *name, int mode)
  #endif
    return dlerror_run (do_dlopen, &args) ? NULL : (void *) args.map;
  }
 +libc_hidden_def (__libc_dlopen_mode)
-
+ 
  #ifndef SHARED
  void *
+
 @@ -191,6 +192,7 @@ __libc_dlsym (void *map, const char *name)
    return (dlerror_run (do_dlsym, &args) ? NULL
  	  : (void *) (DL_SYMBOL_ADDRESS (args.loadbase, args.ref)));
@@ -405,10 +409,10 @@ index 0000000000..1a8f2e9271
 +  xdlclose (libc_handle);
 +}
 diff --git a/include/dlfcn.h b/include/dlfcn.h
-index a4c283728f..d4440c567e 100644
+index a44420fa37439a8565fa60cec9574dbfd05ce082..bdefa6a12d426d39f87c6938c4861c0d6978fd45 100644
 --- a/include/dlfcn.h
 +++ b/include/dlfcn.h
-@@ -45,20 +45,20 @@ extern char **__libc_argv attribute_hidden;
+@@ -49,20 +49,20 @@ extern char **__libc_argv attribute_hidden;
     better error handling semantics for the library.  */
  #define __libc_dlopen(name) \
    __libc_dlopen_mode (name, RTLD_NOW | __RTLD_DLOPEN)
@@ -428,7 +432,7 @@ index a4c283728f..d4440c567e 100644
 +libc_hidden_proto (__libc_dlsym)
 +libc_hidden_proto (__libc_dlvsym)
 +libc_hidden_proto (__libc_dlclose)
-
+ 
  /* Locate shared object containing the given address.  */
  #ifdef ElfW
  extern int _dl_addr (const void *address, Dl_info *info,
@@ -437,9 +441,9 @@ index a4c283728f..d4440c567e 100644
 +		     struct link_map **mapp, const ElfW(Sym) **symbolp);
 +libc_hidden_proto (_dl_addr)
  #endif
-
+ 
  struct link_map;
-@@ -73,21 +73,23 @@ extern void _dl_close_worker (struct link_map *map, bool force)
+@@ -77,21 +77,23 @@ extern void _dl_close_worker (struct link_map *map, bool force)
  /* Look up NAME in shared object HANDLE (which may be RTLD_DEFAULT or
     RTLD_NEXT).  WHO is the calling function, for RTLD_NEXT.  Returns
     the symbol value, which may be NULL.  */
@@ -447,7 +451,7 @@ index a4c283728f..d4440c567e 100644
 -  attribute_hidden;
 +extern void *_dl_sym (void *handle, const char *name, void *who);
 +libc_hidden_proto (_dl_sym)
-
+ 
  /* Look up version VERSION of symbol NAME in shared object HANDLE
     (which may be RTLD_DEFAULT or RTLD_NEXT).  WHO is the calling
     function, for RTLD_NEXT.  Returns the symbol value, which may be
@@ -456,7 +460,7 @@ index a4c283728f..d4440c567e 100644
 -		       void *who) attribute_hidden;
 +		       void *who);
 +libc_hidden_proto (_dl_vsym)
-
+ 
  /* Helper function for <dlfcn.h> functions.  Runs the OPERATE function via
     _dl_catch_error.  Returns zero for success, nonzero for failure; and
     arranges for `dlerror' to return the error details.
@@ -464,11 +468,9 @@ index a4c283728f..d4440c567e 100644
 -extern int _dlerror_run (void (*operate) (void *), void *args) attribute_hidden;
 +extern int _dlerror_run (void (*operate) (void *), void *args);
 +libc_hidden_proto (_dlerror_run)
-
+ 
  /* This structure is used to make the outer (statically linked)
     implementation of dlopen and related functions to the inner libc
---
-2.36.1
 
 From 605a02a9152e832b56e7458bddcebf6da88e791f Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
@@ -500,13 +502,13 @@ index b1454882bd..bde07cdf2a 100644
  	-test ! -x $(elf-objpfx)ldconfig || LC_ALL=C \
  	  $(elf-objpfx)ldconfig $(addprefix -r ,$(install_root)) \
 diff --git a/Makerules b/Makerules
-index 5de2cec6be..d0931a3583 100644
+index 00365bc58be119bb0fec9cf2cfa51780c27fae8c..2c22c69e2199d86264c3a3c4d0492d9b5845682b 100644
 --- a/Makerules
 +++ b/Makerules
-@@ -988,12 +988,14 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
+@@ -939,12 +939,14 @@ versioned := $(strip $(foreach so,$(install-lib.so),\
  install-lib.so-versioned := $(filter $(versioned), $(install-lib.so))
  install-lib.so-unversioned := $(filter-out $(versioned), $(install-lib.so))
-
+ 
 -# For libraries whose soname have version numbers, we install two files:
 +# For libraries whose soname have version numbers, we install three files:
  #	$(inst_libdir)/libfoo.so	-- for linking, symlink or ld script
@@ -518,12 +520,12 @@ index 5de2cec6be..d0931a3583 100644
  				$(inst_libdir)/$L \
 +				$(inst_slibdir)/$(L:.so=)-$(version).so \
  				$(inst_slibdir)/$L$($L-version))
-
+ 
  # Install all the unversioned shared libraries.
-@@ -1026,8 +1028,34 @@ ln -f $(objpfx)/$(@F) $@
+@@ -977,8 +979,34 @@ ln -f $(objpfx)/$(@F) $@
  endef
  endif
-
+ 
 +ifeq (yes,$(build-shared))
 +ifeq (no,$(cross-compiling))
 +symbolic-link-prog := $(elf-objpfx)sln
@@ -554,11 +556,11 @@ index 5de2cec6be..d0931a3583 100644
 +	$(make-shlib-link)
 +$(inst_slibdir)/libc-$(version).so: $(common-objpfx)libc.so $(+force)
  	$(do-install-program)
-
+ 
  install: $(inst_slibdir)/libc.so$(libc.so-version)
-@@ -1097,7 +1125,15 @@ include $(o-iterator)
+@@ -1048,7 +1076,15 @@ include $(o-iterator)
  generated += $(foreach o,$(versioned),$o$($o-version))
-
+ 
  define o-iterator-doit
 -$(inst_slibdir)/$o$($o-version): $(objpfx)$o $(+force);
 +$(inst_slibdir)/$o$($o-version): $(inst_slibdir)/$(o:.so=)-$(version).so \
@@ -573,19 +575,20 @@ index 5de2cec6be..d0931a3583 100644
  	$$(do-install-program)
  endef
  object-suffixes-left := $(versioned)
+
 diff --git a/elf/Makefile b/elf/Makefile
-index 3536b6af5e..67428f2de2 100644
+index 6c8a9e80ba5f91f88e21478084e981f8a30e911d..61384c9b3f932b8ee7105e83158fd8f847818288 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -1338,10 +1338,16 @@ $(objpfx)trusted-dirs.st: Makefile $(..)Makeconfig
+@@ -1375,10 +1375,16 @@ $(objpfx)trusted-dirs.st: Makefile $(..)Makeconfig
  CPPFLAGS-dl-load.c += -I$(objpfx). -I$(csu-objpfx).
-
+ 
  ifeq (yes,$(build-shared))
 -$(inst_rtlddir)/$(rtld-installed-name): $(objpfx)ld.so $(+force)
 +$(inst_slibdir)/$(rtld-version-installed-name): $(objpfx)ld.so $(+force)
  	$(make-target-directory)
  	$(do-install-program)
-
+ 
 +$(inst_rtlddir)/$(rtld-installed-name): \
 +  $(inst_slibdir)/$(rtld-version-installed-name) \
 +  $(inst_slibdir)/libc-$(version).so
@@ -595,17 +598,15 @@ index 3536b6af5e..67428f2de2 100644
  # Creates the relative /usr/bin/ld.so symbolic link.
  $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
  	$(make-target-directory)
-@@ -1350,7 +1356,7 @@ $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
+@@ -1387,7 +1393,7 @@ $(inst_bindir)/ld.so: $(inst_rtlddir)/$(rtld-installed-name)
  # Special target called by parent to install just the dynamic linker.
  .PHONY: ldso_install
  ldso_install: $(inst_rtlddir)/$(rtld-installed-name)
 -endif # $(build-shared)
 +endif
-
-
+ 
+ 
  # Workarounds for ${exec_prefix} expansion in configure variables.
---
-2.36.1
 
 From 270af4eb5410092fbcbe7acd369c7e5a9d27f844 Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
@@ -624,10 +625,10 @@ This reverts commit 6bf789d69e6be48419094ca98f064e00297a27d5.
  delete mode 100644 elf/tst-dl-is_dso.c
 
 diff --git a/elf/Makefile b/elf/Makefile
-index 67428f2de2..5bcf73869b 100644
+index 61384c9b3f932b8ee7105e83158fd8f847818288..31d0f611162bc047f9aa18f38a79ddbdefc52eed 100644
 --- a/elf/Makefile
 +++ b/elf/Makefile
-@@ -401,7 +401,6 @@ tests += \
+@@ -404,7 +404,6 @@ tests += \
    tst-big-note \
    tst-debug1 \
    tst-deep1 \
@@ -635,8 +636,9 @@ index 67428f2de2..5bcf73869b 100644
    tst-dlclose-lazy \
    tst-dlmodcount \
    tst-dlmopen-dlerror \
+
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 57bb95ebc3..3924362ce9 100644
+index b64c54b53e1aa5bfb2806eb50d13757e8cb24396..3eab865bf3a0be792cea5d63ff771802d4e3e488 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -42,7 +42,6 @@
@@ -644,10 +646,10 @@ index 57bb95ebc3..3924362ce9 100644
  #include <dl-cache.h>
  #include <dl-hwcaps.h>
 -#include <dl-is_dso.h>
-
+ 
  #include <dl-procinfo.h>
-
-@@ -846,7 +845,9 @@ search_dir (const struct dir_entry *entry)
+ 
+@@ -742,7 +741,9 @@ search_dir (const struct dir_entry *entry)
  	continue;
        /* Does this file look like a shared library?  The dynamic linker
  	 is also considered as shared library.  */
@@ -657,9 +659,7 @@ index 57bb95ebc3..3924362ce9 100644
 +	   || strstr (direntry->d_name, ".so") == NULL)
  	  && (direntry->d_type == DT_REG || entry->hwcaps == NULL))
  	continue;
-
---
-2.36.1
+ 
 
 From 020733a3dcbfbb7340c31c99653a6a95d26b5fe7 Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
@@ -672,21 +672,21 @@ This reverts commit b89d5de2508215ef3131db7bed76ac50b3f4c205.
  1 file changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/Makerules b/Makerules
-index d0931a3583..5b53835faf 100644
+index 2c22c69e2199d86264c3a3c4d0492d9b5845682b..2b56e133f562376cd54a7cab6cf26d6a061787b3 100644
 --- a/Makerules
 +++ b/Makerules
-@@ -981,21 +981,22 @@ install-lib.so := $(filter %.so,$(install-lib:%_pic.a=%.so))
+@@ -932,21 +932,22 @@ install-lib.so := $(filter %.so,$(install-lib:%_pic.a=%.so))
  install-lib := $(filter-out %.so %_pic.a,$(install-lib))
-
+ 
  ifeq (yes,$(build-shared))
 -# Find which .so's have a version number in their soname.
 +# Find which .so's have versions.
  versioned := $(strip $(foreach so,$(install-lib.so),\
  			       $(patsubst %,$(so),$($(so)-version))))
-
+ 
  install-lib.so-versioned := $(filter $(versioned), $(install-lib.so))
  install-lib.so-unversioned := $(filter-out $(versioned), $(install-lib.so))
-
+ 
 -# For libraries whose soname have version numbers, we install three files:
 +# For versioned libraries, we install three files:
  #	$(inst_libdir)/libfoo.so	-- for linking, symlink or ld script
@@ -699,17 +699,17 @@ index d0931a3583..5b53835faf 100644
 -				$(inst_slibdir)/$(L:.so=)-$(version).so \
 +				$(inst_slibdir)/$(L:.so=)-$(lib-version).so \
  				$(inst_slibdir)/$L$($L-version))
-
+ 
  # Install all the unversioned shared libraries.
-@@ -1124,6 +1125,7 @@ include $(o-iterator)
-
+@@ -1075,6 +1076,7 @@ include $(o-iterator)
+ 
  generated += $(foreach o,$(versioned),$o$($o-version))
-
+ 
 +ifeq (,$($(subdir)-version))
  define o-iterator-doit
  $(inst_slibdir)/$o$($o-version): $(inst_slibdir)/$(o:.so=)-$(version).so \
  				 $(+force);
-@@ -1138,7 +1140,23 @@ $(inst_slibdir)/$(o:.so=)-$(version).so: $(objpfx)$o $(+force);
+@@ -1089,7 +1091,23 @@ $(inst_slibdir)/$(o:.so=)-$(version).so: $(objpfx)$o $(+force);
  endef
  object-suffixes-left := $(versioned)
  include $(o-iterator)
@@ -731,11 +731,9 @@ index d0931a3583..5b53835faf 100644
 +include $(o-iterator)
 +endif
 +endif
-
+ 
  define do-install-so
  $(do-install-program)
---
-2.36.1
 
 From 0a5e5014b621fed7fe077fdcbdd7727dd12c8d9f Mon Sep 17 00:00:00 2001
 From: Thomas Crider <gloriouseggroll@gmail.com>
