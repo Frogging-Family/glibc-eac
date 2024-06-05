@@ -1,6 +1,6 @@
   # Enable/disable each fix we offer
   _reenable_dt_hash="true"
-  _rogue_company_fix="true"
+  _rogue_company_fix="false"
   _disable_tests="true" # They are very playful and seem to fail randomly in different ways depending on the machine, so let's disable them by default - https://github.com/Frogging-Family/glibc-eac/issues/2
   _upstream_commit="" # 2.39-4 commit was 31da30f23cddd36db29d5b6a1c7619361b271fb4
 
