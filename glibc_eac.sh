@@ -19,11 +19,11 @@
   fi
 
   if [ "$1" = "build" ]; then
-    makepkg --noconfirm -sc
+    makepkg --noconfirm --skipinteg -sc
   else
     echo "############################################################################################"
     echo "! Defaulting to building then installing ! If you only want to build, run './glibc_eac.sh build'"
     echo "############################################################################################"
     read -rp "Press enter to continue or hit ctrl+c to leave"
-    makepkg --noconfirm -sic
+    makepkg --noconfirm --skipinteg -sic
   fi
