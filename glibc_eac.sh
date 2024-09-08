@@ -53,12 +53,19 @@ if [ -n "$_upstream_commit" ]; then
   sed -i "s/_commit=.*/_commit=$_upstream_commit/g" PKGBUILD
 fi
 
-if [ "$1" = "build" ]; then
-  makepkg --noconfirm --skipinteg -sc
-else
-  echo "############################################################################################"
-  echo "!! Default is to build and install !! If you want to build only, run: './glibc_eac.sh build'"
-  echo "############################################################################################"
-  read -rp "Press enter to continue or hit ctrl+c to leave"
-  makepkg --noconfirm --skipinteg -sic
-fi
+case "$1" in
+  unattended)
+    echo "::: Building in unattended mode..."
+    makepkg --noconfirm --skipinteg -sc
+    ;;
+  build)
+    echo "::: Build only.  If you want to build and install, re-run without options."
+    read -rp "Press enter to continue or hit ctrl+c to leave"
+    makepkg --noconfirm --skipinteg -sc
+    ;;
+  *)
+    echo "::: Build and install.  If you want to build only, run: './glibc_eac.sh build'"
+    read -rp "Press enter to continue or hit ctrl+c to leave"
+    makepkg --noconfirm --skipinteg -sic
+    ;;
+esac
