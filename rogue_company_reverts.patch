@@ -40,7 +40,7 @@ index a50a988e7362cf3b20ea1c05e1f8eb9f6df2b996..6c8a9e80ba5f91f88e21478084e981f8
    tst-tls1-static \
    tst-tls1-static-non-pie \
    tst-tunables \
-+  tst-libc_dlvsym-static
++  tst-libc_dlvsym-static \
    # tests-static-internal
  
  CRT-tst-tls1-static-non-pie := $(csu-objpfx)crt1.o
