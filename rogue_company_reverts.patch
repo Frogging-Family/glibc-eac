@@ -64,8 +64,8 @@ index a50a988e7362cf3b20ea1c05e1f8eb9f6df2b996..6c8a9e80ba5f91f88e21478084e981f8
  
  # Most modules build with _ISOMAC defined, but those filtered out
  # depend on internal headers.
--modules-names-tests = $(filter-out ifuncmod% tst-tlsmod%,\
-+modules-names-tests = $(filter-out ifuncmod% tst-libc_dlvsym-dso tst-tlsmod%,\
+-modules-names-tests = $(filter-out ifuncmod% tst-tlsmod% \
++modules-names-tests = $(filter-out ifuncmod% tst-libc_dlvsym-dso tst-tlsmod% \
  				   $(modules-names))
  
  # For +depfiles in Makerules.
