@@ -1,6 +1,6 @@
 # glibc-eac
 
-## *WARNING* : This needs to be rebuilt against your systems libs on each glibc update from your distro to prevent issues ##
+## *WARNING* : This needs to be rebuilt against your systems libs on each glibc update from your distro to prevent issues
 
 **Update2: As of 2.39-1, DT_HASH reenabling was removed from the Arch package. While many games were patched, not all were. We have added the patch for it back for the affected games.**
 
@@ -20,5 +20,5 @@ Brawlhalla - eos-eac
 Rogue Company (Steam) - eos-eac (with a twist?)
 ![Screenshot_20220808_163238](https://user-images.githubusercontent.com/741977/183456573-be2ca774-524e-413a-b5d0-90e838637585.png)
 
-Dauntless (EGS) - legacy eac - has other issues (stack smashing)
+Dauntless (EGS) - legacy eac - has other issues (stack smashing) - RIP, poor game, you deserved better
 ![Screenshot_20220808_174604](https://user-images.githubusercontent.com/741977/183458660-e3190107-3f45-40ad-a46e-8af691cb09c7.png)
